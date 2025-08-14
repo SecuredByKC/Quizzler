@@ -6,7 +6,7 @@
 
 **A modern, interactive quiz application with AI-powered content generation**
 
-[![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-green?style=for-the-badge)](https://your-app-name.netlify.app)
+[![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-green?style=for-the-badge)](https://quizzlerpro.netlify.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Made with HTML5](https://img.shields.io/badge/Made%20with-HTML5-orange?style=for-the-badge&logo=html5)](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)
 [![Netlify Status](https://img.shields.io/badge/Deployed%20on-Netlify-blue?style=for-the-badge&logo=netlify)](https://netlify.com)
@@ -175,12 +175,12 @@ Create quiz files using this simple format:
 We welcome contributions! Here's how you can help:
 
 ### 🐛 **Bug Reports**
-- Use the [Issues](https://github.com/yourusername/quizzler-pro/issues) tab
+- Use the [Issues](https://github.com/SecuredByKC/Quizzler/issues) tab
 - Include browser version and steps to reproduce
 - Screenshots are helpful!
 
 ### ✨ **Feature Requests**  
-- Suggest new features via [Issues](https://github.com/yourusername/quizzler-pro/issues)
+- Suggest new features via [Issues](https://github.com/SecuredByKC/Quizzler/issues)
 - Explain the use case and expected behavior
 - Check existing issues to avoid duplicates
 

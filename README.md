@@ -64,7 +64,7 @@ open index.html
 2. **Connect to Netlify** or your preferred hosting service
 3. **Your quiz app is live!**
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/quizzler-pro)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/SecuredByKC/QuizzlerPro)
 
 ## 📝 Creating Quiz Content
 
@@ -212,12 +212,12 @@ Smart prompt generator for creating custom quiz content with ChatGPT
 We welcome contributions! Here's how you can help:
 
 ### 🐛 **Bug Reports**
-- Use the [Issues](https://github.com/SecuredByKC/Quizzler/issues) tab
+- Use the [Issues](https://github.com/SecuredByKC/QuizzlerPro/issues) tab
 - Include browser version and steps to reproduce
 - Screenshots are helpful!
 
 ### ✨ **Feature Requests**  
-- Suggest new features via [Issues](https://github.com/SecuredByKC/Quizzler/issues)
+- Suggest new features via [Issues](https://github.com/SecuredByKC/QuizzlerPro/issues)
 - Explain the use case and expected behavior
 - Check existing issues to avoid duplicates
 
@@ -273,8 +273,8 @@ SOFTWARE.
 
 ### 🆘 **Getting Help**
 - 📖 **Documentation** - Check this README and code comments
-- 🐛 **Issues** - Search existing [issues](https://github.com/yourusername/quizzler-pro/issues) or create a new one
-- 💬 **Discussions** - Join the conversation in [Discussions](https://github.com/yourusername/quizzler-pro/discussions)
+- 🐛 **Issues** - Search existing [issues](https://github.com/SecuredByKC/QuizzlerPro/issues) or create a new one
+- 💬 **Discussions** - Join the conversation in [Discussions](https://github.com/SecuredByKC/QuizzlerPro/discussions)
 
 ### 🔧 **Troubleshooting**
 - **CSV Upload Issues** - Ensure your file follows the exact format shown above
@@ -303,9 +303,9 @@ Have ideas for new features? We'd love to hear them! Open an issue with the `enh
 
 ⭐ **Star this repo** if you found it helpful! ⭐
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/quizzler-pro?style=social)](https://github.com/yourusername/quizzler-pro/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/quizzler-pro?style=social)](https://github.com/yourusername/quizzler-pro/network/members)
+[![GitHub stars](https://img.shields.io/github/stars/SecuredByKC/QuizzlerPro?style=social)](https://github.com/SecuredByKC/QuizzlerPro/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/SecuredByKC/QuizzlerPro?style=social)](https://github.com/SecuredByKC/QuizzlerPro/network/members)
 
-[🌐 Live Demo](https://your-app-name.netlify.app) • [📝 Documentation](https://github.com/yourusername/quizzler-pro#readme) • [🐛 Report Bug](https://github.com/yourusername/quizzler-pro/issues) • [✨ Request Feature](https://github.com/yourusername/quizzler-pro/issues)
+[🌐 Live Demo](https://quizzlerpro.netlify.app) • [📝 Documentation](https://github.com/SecuredByKC/QuizzlerPro#readme) • [🐛 Report Bug](https://github.com/SecuredByKC/QuizzlerPro/issues) • [✨ Request Feature](https://github.com/SecuredByKC/QuizzlerPro/issues)
 
 </div>

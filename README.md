@@ -46,7 +46,7 @@
 ## 🚀 Quick Start
 
 ### 🌐 **Try It Now**
-👉 **[Live Demo](https://your-app-name.netlify.app)** - No installation required!
+👉 **[Live Demo](https://quizzlerpro.netlify.app)** - No installation required!
 
 ### 💻 **Local Development**
 ```bash

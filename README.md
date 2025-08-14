@@ -139,18 +139,54 @@ Create quiz files using this simple format:
 
 <div align="center">
 
-### 🏠 Home Screen
-*Clean, modern interface with easy file upload and configuration*
-![Home Screen (Light Mode)](https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/HomeScreenLightMode.jpg) | ![Home Screen (Dark Mode)](https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/HomeScreenDarkMode.jpg)
+## 🏠 Home Screen
+Clean, modern interface with easy file upload and configuration
 
-### 🎯 Quiz Interface  
-*Intuitive question display with progress tracking and beautiful animations*
+<p float="left">
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/HomeScreenDarkMode.jpg" width="45%" />
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/HomeScreenLightMode.jpg" width="45%" />
+</p>
 
-### 📊 Results & Analytics
-*Detailed performance analysis with missed question review*
+---
 
-### 🤖 AI Content Generator
-*Smart prompt generator for creating custom quiz content with ChatGPT*
+## 🎯 Quiz Interface
+Intuitive question display with progress tracking and beautiful animations
+
+<p float="left">
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/SampleCorrectAnswerDarkMode.jpg" width="45%" />
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/SampleCorrectAnswerLightMode.jpg" width="45%" />
+</p>
+
+<p float="left">
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/SampleCorrectAnswerDarkMode2.jpg" width="45%" />
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/SampleWrongAnswerLightMode.jpg" width="45%" />
+</p>
+
+---
+
+## 📊 Results & Analytics
+Detailed performance analysis with missed question review
+
+<p float="left">
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/PerformanceStatsDarkMode.jpg" width="45%" />
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/PerformanceStatsScreenLightMode.jpg" width="45%" />
+</p>
+
+<p float="left">
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/QuizSummaryDarkMode.jpg" width="45%" />
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/QuizSummaryLightMode.jpg" width="45%" />
+</p>
+
+---
+
+## 🤖 AI Content Generator
+Smart prompt generator for creating custom quiz content with ChatGPT
+
+<p float="left">
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/QuizFileGenScreenDarkMode.jpg" width="45%" />
+  <img src="https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/QuizFileGenScreenLightMode.jpg" width="45%" />
+</p>
+
 
 </div>
 

@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzler Pro - Interactive Quiz App</title>
+    <meta name="description" content="Interactive quiz application with CSV support, performance tracking, and smart question generation">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
+        .light-mode {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #4CAF50, #2196F3, #FF9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dark-mode .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .card.slide-in {
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 5px;
+            min-width: 120px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+        }
+
+        .question-btn {
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            text-align: left;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .question-btn {
+            background: linear-gradient(45deg, #495057, #6c757d);
+            border-color: #6c757d;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .question-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #007bff;
+        }
+
+        .dark-mode .question-btn:hover {
+            border-color: #17a2b8;
+        }
+
+        .question-btn.correct {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border-color: #4CAF50;
+            color: white;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .question-btn.incorrect {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            border-color: #f44336;
+            color: white;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .question-btn:disabled {
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .timer {
+            font-weight: bold;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 25px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stats-display {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .modal-content {
+            background: rgba(50, 50, 50, 0.95);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+            color: #f44336;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .select {
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+            margin: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .select {
+            border-color: #555;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .quiz-summary {
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .missed-questions {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .missed-question {
+            background: rgba(244, 67, 54, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            color: #333;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .prompt-display {
+            background: #f5f5f5;
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            border-left: 4px solid #2196F3;
+            white-space: pre-wrap;
+        }
+
+        .template-preview {
+            background: #f3e5f5;
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .control-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            .question-btn {
+                font-size: 15px;
+                padding: 12px;
+            }
+            
+            .stats-display {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            z-index: 10000;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        .notification.info {
+            background: #2196F3;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .block {
+            display: block;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="container">
+        <div id="app"></div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
+            <button class="control-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
+            <button class="control-btn" onclick="showStats()" id="statsBtn">📊</button>
+        </div>
+    </div>
+
+    <!-- CSV Help Modal -->
+    <div class="modal" id="csvHelp">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('csvHelp')">&times;</button>
+            <h2 style="text-align: center; color: #4CAF50; margin-bottom: 20px;">📝 How to Create Quiz Files</h2>
+            
+            <!-- Smart Prompt Generator -->
+            <div style="background: linear-gradient(45deg, #4CAF50, #45a049); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <h3>🚀 Smart ChatGPT Prompt Generator</h3>
+                <p style="margin-bottom: 15px;">Fill out the form below to generate a custom prompt for ChatGPT:</p>
+                
+                <div class="form-section">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Subject/Topic:</label>
+                        <input type="text" id="promptTopic" placeholder="e.g., World War II, JavaScript, Biology, Mathematics" class="input-field">
+                    </div>
+                    
+                    <div class="flex-row">
+                        <div class="flex-1">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Number of Questions:</label>
+                            <input type="number" id="promptQuestions" value="10" min="1" max="50" class="input-field">
+                        </div>
+                        <div class="flex-1">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty:</label>
+                            <select id="promptDifficulty" class="input-field">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate" selected>Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Specific Focus (Optional):</label>
+                        <input type="text" id="promptFocus" placeholder="e.g., causes and effects, syntax and methods, cellular processes" class="input-field">
+                    </div>
+                    
+                    <button class="btn" onclick="generateCustomPrompt()" style="background: white; color: #4CAF50; width: 100%; margin-top: 10px;">
+                        ✨ Generate Custom Prompt
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Generated Prompt Display -->
+            <div id="generatedPromptSection" class="hidden" style="background: rgba(33, 150, 243, 0.1); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <h3 style="color: #2196F3; margin-bottom: 15px;">🤖 Your Custom ChatGPT Prompt</h3>
+                <p style="margin-bottom: 10px;">Copy this prompt and paste it into ChatGPT:</p>
+                
+                <div id="customPromptText" class="prompt-display"></div>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="copyCustomPrompt()">📋 Copy Prompt</button>
+                    <button class="btn" onclick="openChatGPTWithPrompt()" style="background: #10a37f;">💬 Open ChatGPT</button>
+                    <button class="btn btn-warning" onclick="resetPromptForm()">🔄 Reset Form</button>
+                </div>
+            </div>
+            
+            <!-- CSV Template Download -->
+            <div style="background: rgba(255, 152, 0, 0.1); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <h3 style="color: #FF9800;">📥 Download CSV Template</h3>
+                <p style="margin-bottom: 15px;">Download a ready-to-use CSV template that you can:</p>
+                <ul style="text-align: left; margin: 10px 0 15px 20px; font-size: 14px;">
+                    <li>📤 <strong>Upload to ChatGPT</strong> and ask it to fill out</li>
+                    <li>✏️ <strong>Edit manually</strong> in Excel, Google Sheets, or Notepad</li>
+                    <li>📋 <strong>Use as reference</strong> for the correct format</li>
+                </ul>
+                
+                <div style="background: #fff3e0; color: #333; padding: 15px; border-radius: 10px; margin: 15px 0; font-family: monospace; font-size: 12px;">
+                    <strong>Template includes:</strong><br>
+                    • Headers row for easy editing<br>
+                    • 3 sample questions<br>
+                    • Proper CSV formatting<br>
+                    • Instructions in comments
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-warning" onclick="downloadCSVTemplate()">📥 Download CSV Template</button>
+                    <button class="btn btn-secondary" onclick="previewTemplate()">👁️ Preview Template</button>
+                </div>
+            </div>
+            
+            <!-- Template Preview -->
+            <div id="templatePreview" class="hidden" style="background: rgba(156, 39, 176, 0.1); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <h4 style="color: #9C27B0; margin-bottom: 10px;">📋 Template Preview</h4>
+                <div id="templateContent" class="template-preview"></div>
+                <p style="font-size: 12px; margin-top: 10px; opacity: 0.8;">
+                    <strong>Note:</strong> When using with ChatGPT, upload this file and say "Fill out this CSV template with [NUMBER] questions about [TOPIC]"
+                </p>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button class="btn" onclick="closeModal('csvHelp')">Got It! 👍</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('statsModal')">&times;</button>
+            <h2>📊 Performance Statistics</h2>
+            <div id="statsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let darkMode = false;
+        let soundEnabled = true;
+        let quizData = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let startTime = null;
+        let timerInterval = null;
+        let randomizeQuestions = false;
+        let maxAttempts = 3;
+        let currentAttempts = 0;
+        let hadWrongAttempt = false;
+        let incorrectQuestions = [];
+        let questionTimes = [];
+        let currentFileName = '';
+
+        // Performance tracking
+        let performanceHistory = JSON.parse(localStorage.getItem('quizPerformance') || '[]');
+
+        // Audio context for sound effects
+        let audioContext;
+        let correctSound, incorrectSound;
+
+        // Initialize app
+        function initApp() {
+            setupAudio();
+            showInitialScreen();
+        }
+
+        // Audio setup
+        function setupAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                createSounds();
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        function createSounds() {
+            correctSound = () => {
+                if (!soundEnabled || !audioContext) return;
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            };
+
+            incorrectSound = () => {
+                if (!soundEnabled || !audioContext) return;
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(329.63, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(246.94, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.4);
+            };
+        }
+
+        // Control functions
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            document.body.className = darkMode ? 'dark-mode' : 'light-mode';
+            document.getElementById('themeBtn').textContent = darkMode ? '☀️' : '🌙';
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundBtn').textContent = soundEnabled ? '🔊' : '🔇';
+            
+            if (soundEnabled && audioContext) {
+                correctSound();
+            }
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function showStats() {
+            document.getElementById('statsModal').style.display = 'flex';
+            renderStats();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Visual notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Stats rendering
+        function renderStats() {
+            const statsContent = document.getElementById('statsContent');
+            
+            if (performanceHistory.length === 0) {
+                statsContent.innerHTML = '<p>No quiz data yet. Complete a quiz to see your stats!</p>';
+                return;
+            }
+
+            const totalQuizzes = performanceHistory.length;
+            const avgScore = performanceHistory.reduce((sum, quiz) => sum + quiz.percentage, 0) / totalQuizzes;
+            const avgTime = performanceHistory.reduce((sum, quiz) => sum + (quiz.avgTimePerQuestion || 0), 0) / totalQuizzes;
+            const bestScore = Math.max(...performanceHistory.map(quiz => quiz.percentage));
+
+            statsContent.innerHTML = `
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <span class="stat-number">${totalQuizzes}</span>
+                        <span class="stat-label">Quizzes Taken</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">${avgScore.toFixed(1)}%</span>
+                        <span class="stat-label">Average Score</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">${avgTime.toFixed(1)}s</span>
+                        <span class="stat-label">Avg Time/Q</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">${bestScore}%</span>
+                        <span class="stat-label">Best Score</span>
+                    </div>
+                </div>
+                
+                <h3>Recent Quiz Results</h3>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    ${performanceHistory.slice(-10).reverse().map((quiz, index) => `
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; margin: 10px 0; border-radius: 10px; backdrop-filter: blur(10px);">
+                            <strong>${quiz.fileName || 'Quiz ' + (performanceHistory.length - index)}</strong><br>
+                            Score: ${quiz.percentage}% (${quiz.correct}/${quiz.total})<br>
+                            Time: ${Math.round(quiz.totalTime)}s | Avg: ${(quiz.avgTimePerQuestion || 0).toFixed(1)}s/question<br>
+                            <small>Date: ${new Date(quiz.date).toLocaleDateString()}</small>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showInitialScreen() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            document.getElementById('app').innerHTML = `
+                <div class="logo pulse">🧠 Quizzler Pro</div>
+                
+                <div class="card slide-in">
+                    <div style="text-align: center;">
+                        <p style="font-size: 18px; margin-bottom: 20px;">Ready to challenge your mind?</p>
+                        
+                        <button class="btn btn-warning" onclick="showHelp()" style="margin-bottom: 20px;">📝 CSV Format Help</button>
+                        
+                        <div style="margin: 20px 0;">
+                            <label for="csvFile" class="file-label">
+                                📁 Choose Quiz File
+                            </label>
+                            <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="handleFileSelect(event)">
+                        </div>
+                        
+                        <p id="selectedFile" style="margin: 10px 0; font-style: italic; opacity: 0.8;">No file selected</p>
+                        
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 10px;">Attempts per question:</label>
+                            <select id="maxAttempts" class="select">
+                                <option value="1">1 Try (Hard)</option>
+                                <option value="2">2 Tries (Medium)</option>
+                                <option value="3" selected>3 Tries (Easy)</option>
+                            </select>
+                        </div>
+                        
+                        <button id="shuffleBtn" class="btn btn-secondary" onclick="toggleShuffle()">
+                            🔀 Question Shuffle: OFF
+                        </button>
+                        
+                        <br><br>
+                        
+                        <button id="startBtn" class="btn" onclick="startQuiz()" disabled style="font-size: 18px; padding: 15px 30px;">
+                            🚀 Start Quiz
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showHelp() {
+            document.getElementById('csvHelp').style.display = 'flex';
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            quizData = [];
+            let startIndex = 0;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.startsWith('#') || line === '') {
+                    continue;
+                } else if (line.toLowerCase().includes('question') && line.toLowerCase().includes('option') && line.toLowerCase().includes('answer')) {
+                    startIndex = i + 1;
+                    console.log('Headers detected at line', i + 1, 'skipping comments and headers');
+                    break;
+                } else {
+                    startIndex = i;
+                    break;
+                }
+            }
+            
+            for (let i = startIndex; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.trim() && !line.trim().startsWith('#')) {
+                    const parts = parseCSVLine(line);
+                    if (parts.length >= 6) {
+                        const question = parts[0].trim();
+                        if (!question.toLowerCase().includes('example') && 
+                            !question.includes('[Question') && 
+                            question.length > 5) {
+                            quizData.push({
+                                question: question,
+                                options: [
+                                    parts[1].trim(),
+                                    parts[2].trim(), 
+                                    parts[3].trim(),
+                                    parts[4].trim()
+                                ],
+                                correct: parts[5].trim().toUpperCase(),
+                                id: Math.random().toString(36).substr(2, 9)
+                            });
+                        }
+                    }
+                }
+            }
+            
+            console.log(`Parsed ${quizData.length} valid questions from CSV`);
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            let i = 0;
+            
+            while (i < line.length) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        i += 2;
+                    } else {
+                        inQuotes = !inQuotes;
+                        i++;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                    i++;
+                } else {
+                    current += char;
+                    i++;
+                }
+            }
+            
+            result.push(current);
+            return result;
+        }
+
+        function downloadCSVTemplate() {
+            const topic = document.getElementById('promptTopic').value.trim();
+            const questions = parseInt(document.getElementById('promptQuestions').value);
+            const difficulty = document.getElementById('promptDifficulty').value;
+            const focus = document.getElementById('promptFocus').value.trim();
+            
+            if (!topic) {
+                showNotification('❌ Please fill out the topic first!', 'error');
+                return;
+            }
+            
+            if (questions < 1 || questions > 50 || isNaN(questions)) {
+                showNotification('❌ Please enter 1-50 questions!', 'error');
+                return;
+            }
+            
+            let templateContent = `# INSTRUCTIONS FOR AI: Please fill out this CSV template
+# Topic: ${topic}
+# Number of questions needed: ${questions}
+# Difficulty level: ${difficulty}
+# ${focus ? 'Specific focus: ' + focus : 'Cover general aspects of the topic'}
+#
+# TASK: Replace the example rows below with ${questions} real questions about "${topic}"
+# Keep the header row exactly as is, but replace all example questions
+# Make questions ${difficulty} difficulty level
+# ${focus ? 'Focus specifically on: ' + focus : ''}
+# Ensure one answer is clearly correct, others are plausible but wrong
+#
+# FORMAT: Each question row must have exactly 6 columns as shown below
+# "Question","Option A","Option B","Option C","Option D","Correct Answer"
+#
+"Question","Option A","Option B","Option C","Option D","Correct Answer"
+"EXAMPLE: What is the capital of France?","Paris","London","Berlin","Madrid","A"
+"EXAMPLE: What is 2 + 2?","3","4","5","6","B"
+"EXAMPLE: Replace these examples with ${questions} questions about ${topic}","Option A","Option B","Option C","Option D","A"`;
+
+            for (let i = 3; i < questions; i++) {
+                templateContent += `\n"[Question ${i + 1} about ${topic}]","[Option A]","[Option B]","[Option C]","[Option D]","[A/B/C/D]"`;
+            }
+
+            const blob = new Blob([templateContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quiz-template-${topic.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${questions}q.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification(`📥 Smart template downloaded!`, 'success');
+        }
+
+        function previewTemplate() {
+            const topic = document.getElementById('promptTopic').value.trim() || 'Your Topic';
+            const questions = parseInt(document.getElementById('promptQuestions').value) || 10;
+            const difficulty = document.getElementById('promptDifficulty').value;
+            const focus = document.getElementById('promptFocus').value.trim();
+            
+            const templateContent = `# INSTRUCTIONS FOR AI: Please fill out this CSV template
+# Topic: ${topic}
+# Number of questions needed: ${questions}
+# Difficulty level: ${difficulty}
+# ${focus ? 'Specific focus: ' + focus : 'Cover general aspects of the topic'}
+#
+# TASK: Replace the example rows with ${questions} real questions about "${topic}"
+# Keep the header row, but replace all example questions
+# Make questions ${difficulty} difficulty level
+#
+"Question","Option A","Option B","Option C","Option D","Correct Answer"
+"EXAMPLE: What is the capital of France?","Paris","London","Berlin","Madrid","A"
+"EXAMPLE: What is 2 + 2?","3","4","5","6","B"
+"[Question 3 about ${topic}]","[Option A]","[Option B]","[Option C]","[Option D]","[A/B/C/D]"
+... (${questions - 3} more rows to be filled)`;
+            
+            document.getElementById('templateContent').textContent = templateContent;
+            document.getElementById('templatePreview').classList.remove('hidden');
+            document.getElementById('templatePreview').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateCustomPrompt() {
+            const topic = document.getElementById('promptTopic').value.trim();
+            const questions = parseInt(document.getElementById('promptQuestions').value);
+            const difficulty = document.getElementById('promptDifficulty').value;
+            const focus = document.getElementById('promptFocus').value.trim();
+            
+            if (!topic) {
+                showNotification('❌ Please enter a topic!', 'error');
+                return;
+            }
+            
+            if (questions < 1 || questions > 50 || isNaN(questions)) {
+                showNotification('❌ Please enter 1-50 questions!', 'error');
+                return;
+            }
+            
+            let prompt = `Create a ${questions}-question multiple-choice quiz in CSV format covering the topic "${topic}" at ${difficulty} level.`;
+            
+            if (focus) {
+                prompt += `\n\nSpecific focus areas: ${focus}`;
+            }
+            
+            prompt += `\n\nEach row must contain:
+1. A question
+2. Four options (A through D)
+3. The correct answer letter (A/B/C/D)
+
+Format each row EXACTLY like this (with quotes around each field):
+"Question text here","Option A","Option B","Option C","Option D","A"
+
+Requirements:
+- Create exactly ${questions} unique questions about ${topic}
+- Make questions ${difficulty} difficulty level
+- Ensure one answer is clearly correct, others are plausible but wrong
+- Cover different aspects of ${topic}${focus ? ' with focus on: ' + focus : ''}
+- NO headers in the CSV, just question rows
+- Each row must have exactly 6 fields wrapped in quotes
+
+Example format:
+"What year did World War II end?","1943","1944","1945","1946","C"
+"Who was the leader of Nazi Germany?","Stalin","Churchill","Hitler","Roosevelt","C"
+"Which country was NOT part of the Axis powers?","Germany","Japan","Italy","France","D"
+
+Please generate exactly ${questions} questions following this format.`;
+            
+            document.getElementById('customPromptText').textContent = prompt;
+            document.getElementById('generatedPromptSection').classList.remove('hidden');
+            document.getElementById('generatedPromptSection').scrollIntoView({ behavior: 'smooth' });
+            
+            showNotification('✅ Custom prompt generated!', 'success');
+        }
+
+        function copyCustomPrompt() {
+            const promptText = document.getElementById('customPromptText').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(promptText).then(() => {
+                    showNotification('✅ Custom prompt copied!', 'success');
+                }).catch(() => {
+                    showNotification('❌ Could not copy to clipboard', 'error');
+                });
+            } else {
+                showNotification('❌ Clipboard not supported', 'error');
+            }
+        }
+
+        function openChatGPTWithPrompt() {
+            window.open('https://chat.openai.com/', '_blank');
+            showNotification('💬 ChatGPT opened!', 'info');
+        }
+
+        function resetPromptForm() {
+            document.getElementById('promptTopic').value = '';
+            document.getElementById('promptQuestions').value = '10';
+            document.getElementById('promptDifficulty').value = 'intermediate';
+            document.getElementById('promptFocus').value = '';
+            document.getElementById('generatedPromptSection').classList.add('hidden');
+            showNotification('🔄 Form reset!', 'info');
+        }
+
+        function toggleShuffle() {
+            randomizeQuestions = !randomizeQuestions;
+            document.getElementById('shuffleBtn').innerHTML = 
+                `🔀 Question Shuffle: ${randomizeQuestions ? '<span style="color: #4CAF50;">ON</span>' : '<span style="color: #f44336;">OFF</span>'}`;
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'text/csv') {
+                currentFileName = file.name.replace('.csv', '');
+                document.getElementById('selectedFile').innerHTML = `<span style="color: #4CAF50;">✅ ${file.name}</span>`;
+                document.getElementById('startBtn').disabled = false;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    parseCSV(e.target.result);
+                    showNotification(`✅ Loaded ${quizData.length} questions!`, 'success');
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            maxAttempts = parseInt(document.getElementById('maxAttempts').value);
+            
+            if (randomizeQuestions) {
+                quizData = shuffleArray([...quizData]);
+            }
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            incorrectQuestions = [];
+            questionTimes = [];
+            startTime = new Date();
+            startTimer();
+            showQuestion();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (startTime) {
+                const elapsed = new Date() - startTime;
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                
+                const timerElement = document.getElementById('timer');
+                if (timerElement) {
+                    timerElement.textContent = 
+                        `⏱️ ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }                  
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showResults();
+                return;
+            }
+
+            const question = quizData[currentQuestionIndex];
+            const questionStartTime = new Date();
+            currentAttempts = 0;
+            hadWrongAttempt = false;
+            
+            const progress = ((currentQuestionIndex) / quizData.length) * 100;
+            
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div style="font-weight: bold;">Question ${currentQuestionIndex + 1} of ${quizData.length}</div>
+                    <div id="timer" class="timer">⏱️ 00:00:00</div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: ${progress}%"></div>
+                </div>
+                
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <span class="stat-number">${score}</span>
+                        <span class="stat-label">Score</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">${currentQuestionIndex}</span>
+                        <span class="stat-label">Progress</span>
+                    </div>
+                </div>
+                
+                <div class="card slide-in">
+                    <h2 style="text-align: center; margin-bottom: 30px; line-height: 1.4;">
+                        ${question.question}
+                    </h2>
+                    
+                    <div id="feedback" class="feedback"></div>
+                    
+                    <div id="options">
+                        ${question.options.map((option, index) => `
+                            <button class="question-btn" onclick="checkAnswer('${String.fromCharCode(65 + index)}')" id="btn${index}">
+                                <strong>${String.fromCharCode(65 + index)}.</strong> ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button id="continueBtn" class="btn" onclick="nextQuestion()" disabled>
+                            ${currentQuestionIndex === quizData.length - 1 ? '🏁 Finish Quiz' : '➡️ Continue'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="showInitialScreen()">🏠 Home</button>
+                    </div>
+                </div>
+            `;
+            
+            question.startTime = questionStartTime;
+        }
+
+        function checkAnswer(selected) {
+            const question = quizData[currentQuestionIndex];
+            const correct = question.correct;
+            currentAttempts++;
+            
+            const questionTime = (new Date() - question.startTime) / 1000;
+            questionTimes.push(questionTime);
+            
+            const selectedIndex = selected.charCodeAt(0) - 65;
+            const correctIndex = correct.charCodeAt(0) - 65;
+            
+            if (selected === correct) {
+                document.getElementById(`btn${selectedIndex}`).className = 'question-btn correct';
+                document.getElementById('feedback').innerHTML = '<span style="color: #4CAF50;">✅ Correct!</span>';
+                document.getElementById('continueBtn').disabled = false;
+                
+                for (let i = 0; i < 4; i++) {
+                    document.getElementById(`btn${i}`).disabled = true;
+                }
+                
+                if (!hadWrongAttempt) {
+                    score++;
+                } else {
+                    incorrectQuestions.push(question);
+                }
+                
+                correctSound();
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+                
+            } else {
+                hadWrongAttempt = true;
+                document.getElementById(`btn${selectedIndex}`).className = 'question-btn incorrect';
+                
+                incorrectSound();
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+                
+                if (currentAttempts >= maxAttempts) {
+                    document.getElementById(`btn${correctIndex}`).className = 'question-btn correct';
+                    document.getElementById('feedback').innerHTML = '<span style="color: #f44336;">❌ Out of tries. Correct answer highlighted.</span>';
+                    document.getElementById('continueBtn').disabled = false;
+                    incorrectQuestions.push(question);
+                    
+                    for (let i = 0; i < 4; i++) {
+                        document.getElementById(`btn${i}`).disabled = true;
+                    }
+                } else {
+                    document.getElementById('feedback').innerHTML = 
+                        `<span style="color: #ff9800;">⚠️ Incorrect. ${maxAttempts - currentAttempts} tries remaining</span>`;
+                    document.getElementById(`btn${selectedIndex}`).disabled = true;
+                }
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            
+            const totalQuestions = quizData.length;
+            const actualCorrect = totalQuestions - incorrectQuestions.length;
+            const percentage = Math.round((actualCorrect / totalQuestions) * 100);
+            const elapsed = new Date() - startTime;
+            const totalSeconds = Math.round(elapsed / 1000);
+            const avgTimePerQuestion = questionTimes.length > 0 ? 
+                Math.round(questionTimes.reduce((sum, time) => sum + time, 0) / questionTimes.length * 10) / 10 : 0;
+            
+            const performanceData = {
+                date: new Date().toISOString(),
+                fileName: currentFileName || 'Unknown Quiz',
+                total: totalQuestions,
+                correct: actualCorrect,
+                percentage: percentage,
+                totalTime: totalSeconds,
+                avgTimePerQuestion: avgTimePerQuestion,
+                questionTimes: questionTimes
+            };
+            
+            performanceHistory.push(performanceData);
+            localStorage.setItem('quizPerformance', JSON.stringify(performanceHistory));
+            
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            let gradeEmoji = '🎉';
+            let gradeText = 'Excellent!';
+            if (percentage < 60) {
+                gradeEmoji = '📚';
+                gradeText = 'Keep studying!';
+            } else if (percentage < 80) {
+                gradeEmoji = '👍';
+                gradeText = 'Good job!';
+            }
+            
+            let missedQuestionsHTML = '';
+            if (incorrectQuestions.length > 0) {
+                missedQuestionsHTML = `
+                    <div class="missed-questions">
+                        <h3>📝 Review of Missed Questions:</h3>
+                        ${incorrectQuestions.map(q => {
+                            const correctIndex = q.correct.charCodeAt(0) - 65;
+                            return `
+                                <div class="missed-question">
+                                    <strong>Q:</strong> ${q.question}<br>
+                                    <strong>Correct Answer:</strong> ${q.correct}. ${q.options[correctIndex]}
+                                </div>
+                            `;
+                        }).join('')}
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-danger" onclick="retryMissed()">
+                                🔄 Retry Missed Questions
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('app').innerHTML = `
+                <div class="card slide-in">
+                    <div class="quiz-summary">
+                        <h1>${gradeEmoji} Quiz Complete!</h1>
+                        <h2>${gradeText}</h2>
+                        <br>
+                        
+                        <div class="stats-display">
+                            <div class="stat-item">
+                                <span class="stat-number">${percentage}%</span>
+                                <span class="stat-label">Score</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${actualCorrect}/${totalQuestions}</span>
+                                <span class="stat-label">Correct</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${timeString}</span>
+                                <span class="stat-label">Time</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${avgTimePerQuestion}s</span>
+                                <span class="stat-label">Avg/Question</span>
+                            </div>
+                        </div>
+                        
+                        ${missedQuestionsHTML}
+                        
+                        <div style="margin-top: 30px;">
+                            <button class="btn" onclick="showInitialScreen()">🏠 New Quiz</button>
+                            <button class="btn btn-secondary" onclick="showStats()">📊 View Stats</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showNotification(`Quiz "${currentFileName}" completed with ${percentage}% score!`, 'success');
+        }
+
+        function retryMissed() {
+            quizData = [...incorrectQuestions];
+            incorrectQuestions = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            questionTimes = [];
+            startTime = new Date();
+            
+            if (randomizeQuestions) {
+                quizData = shuffleArray([...quizData]);
+            }
+            
+            startTimer();
+            showQuestion();
+        }
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            initApp();
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

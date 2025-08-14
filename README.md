@@ -141,6 +141,7 @@ Create quiz files using this simple format:
 
 ### 🏠 Home Screen
 *Clean, modern interface with easy file upload and configuration*
+![Home Screen (Light Mode)](https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/HomeScreenLightMode.jpg) | ![Home Screen (Dark Mode)](https://raw.githubusercontent.com/SecuredByKC/QuizzlerPro/main/HomeScreenDarkMode.jpg)
 
 ### 🎯 Quiz Interface  
 *Intuitive question display with progress tracking and beautiful animations*
